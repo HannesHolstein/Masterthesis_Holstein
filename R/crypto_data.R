@@ -1,6 +1,8 @@
-install.packages("crypto2", dependencies = TRUE)
+#packages needed:
 library(crypto2)
 library(dplyr)
+
+########################
 
 #1. Bitcoin: crypto data list
 crypto_list()
@@ -8,13 +10,18 @@ coins_btc <- crypto_list(only_active=TRUE)
 coins_btc
 coins_btc$row_num <- seq.int(nrow(coins_btc))
 
-#1.1 Bitcoin info list
+#1.1 Bitcoin: info list
 crypto_info(coins_btc,limit=1)
-coin_info_btc <- crypto_info(coins_Btc,limit=1)
+coin_info_btc <- crypto_info(coins_btc,limit=1)
 coin_info_btc
 
-#1.2 Bitcoin time series
+#1.2 Bitcoin: price time series data
 coin_hist_btc <- crypto_history(coins_btc, limit=1, start_date="20160101", end_date="20210105")
+coin_hist_btc_closing <- data.frame(coin_hist_btc$timestamp,coin_hist_btc$close)
+
+#1.3 Bitcoin: Transformation into
+
+########################
 
 #2. Ethereum: crypto data list
 crypto_list()
@@ -23,8 +30,8 @@ coins_eth
 coins_eth$row_num <- seq.int(nrow(coins_eth))
 coins_eth_slice <- coins_eth %>% slice(164:164)
 
+#2.2 Ethereum: price time series data
 coin_hist_eth <- crypto_history(coins_eth_slice, limit=1, start_date="20160101", end_date="20210105")
-
 coin_hist_eth_closing <- data.frame(coin_hist_eth$timestamp,coin_hist_eth$close)
 
 

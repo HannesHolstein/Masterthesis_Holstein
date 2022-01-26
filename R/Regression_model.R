@@ -1,22 +1,4 @@
-library(ggplot2)
-# Building histogram
-ggplot(data=housing, aes(housing$Price)) +
-  geom_histogram(aes(y =..density..), fill = "orange") +
-  geom_density()
 
-# loading psych package
-library(psych)
-psych::describe(housing)
-
-
-library(reshape)
-meltData <- melt(housing)
-p <- ggplot(meltData, aes(factor(variable), value))
-p + geom_boxplot() + facet_wrap(~variable, scale="free")
-
-
-require(corrgram)
-corrgram(housing, order=TRUE)
 
 library(caret)
 # Split data into train and test

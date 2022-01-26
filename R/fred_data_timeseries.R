@@ -1,20 +1,21 @@
-install.packages("fredr")
-install.packages("usethis")
+#packages needed:
 library(usethis)
 library(fredr)
 
+#API-Key for FRED (user dependent)
 usethis::edit_r_environ()
 
-search_gold <- fredr_series_search_text("gold price")
+#Search terms for time series
+search_gold <- fredr_series_search_text("Gold Fixing Price")
 colnames(search_gold)
 
-search_CPI <- fredr_series_search_text("CPI")
+search_CPI <- fredr_series_search_text("Consumer Price Index: Total")
 colnames(search_CPI)
 
-search_REIT <- fredr_series_search_text("REIT")
+search_REIT <- fredr_series_search_text("Wilshire US Real Estate Investment Trust")
 colnames(search_REIT)
 
-search_fixed_income <- fredr_series_search_text("fixed income")
+search_fixed_income <- fredr_series_search_text("6-Month Treasury Bill")
 colnames(search_fixed_income)
 
 search_sp500 <- fredr_series_search_text("stock index")
