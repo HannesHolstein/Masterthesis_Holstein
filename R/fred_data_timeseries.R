@@ -51,3 +51,4 @@ ggplot(series_df) + geom_line(mapping = aes(x=date,y=value),
   ggtitle("Quarterly US imported new car sales, seasonally adjusted [in billion USD]") +
   xlab("time") +
   ylab("quarterly new imported car sales [billion USD]")
+
