@@ -1,6 +1,9 @@
 install.packages("fredr")
+install.packages("usethis")
+library(usethis)
 library(fredr)
-fredr_set_key("93f7d809fb3d323255444683a1d32cfb")
+
+usethis::edit_r_environ()
 
 search_gold <- fredr_series_search_text("gold price")
 colnames(search_gold)
