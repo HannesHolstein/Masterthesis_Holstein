@@ -47,11 +47,11 @@ series_sp500_df <- do.call(cbind.data.frame, series_sp500)
 
 
 # plotting data
-ggplot(series_df) + geom_line(mapping = aes(x=date,y=value),
+ggplot(series_gold_df) + geom_line(mapping = aes(x=date,y=value),
                               color = "red") +
-  ggtitle("Monthly US car production, seasonally adjusted [in thousands]") +
+  ggtitle("Gold Price]") +
   xlab("time") +
-  ylab("monthly cars produced [thousands of units]")
+  ylab("test")
 
 
 
