@@ -1,4 +1,4 @@
-#packages needed:
+#packages
 library(crypto2)
 library(dplyr)
 
@@ -16,10 +16,10 @@ coin_info_btc <- crypto_info(coins_btc,limit=1)
 coin_info_btc
 
 #1.2 Bitcoin: price time series data
-coin_hist_btc <- crypto_history(coins_btc, limit=1, start_date="20160101", end_date="20210105")
+coin_hist_btc <- crypto_history(coins_btc, limit=1, start_date="20160101", end_date="20211201")
 coin_hist_btc_closing <- data.frame(coin_hist_btc$timestamp,coin_hist_btc$close)
 
-#1.3 Bitcoin: Transformation into
+#1.3 Bitcoin: Transformation price into return in %
 
 ########################
 
@@ -31,39 +31,10 @@ coins_eth$row_num <- seq.int(nrow(coins_eth))
 coins_eth_slice <- coins_eth %>% slice(164:164)
 
 #2.2 Ethereum: price time series data
-coin_hist_eth <- crypto_history(coins_eth_slice, limit=1, start_date="20160101", end_date="20210105")
+coin_hist_eth <- crypto_history(coins_eth_slice, limit=1, start_date="20160101", end_date="20220101")
 coin_hist_eth_closing <- data.frame(coin_hist_eth$timestamp,coin_hist_eth$close)
 
 
 
 
 
-
-
-
-
-
-
-
-coin_hist %>% group_by(slug) %>% slice(1:2)
-
-fiats <- fiat_list()
-fiats
-
-coin_hist2 <- crypto_history(coins, convert="BTC,EUR", limit=3, start_date="20210101", end_date="20210105")
-
-coin_hist2 %>% group_by(slug,ref_cur) %>% slice(1:2)
-
-exchanges <- exchange_list(only_active=TRUE)
-exchanges
-
-ex_info <- exchange_info(exchanges %>% filter(slug %in% c('binance','kraken')))
-ex_info
-
-
-ex_info %>% select(contains("fee"))
-ex_info %>% select(contains("spot"))
-
-
-
-ex_info %>% select(slug,fiats) %>% tidyr::unnest(fiats)
