@@ -23,13 +23,13 @@ startgazer(ols_model, type="text")
 ##  When comparing different models, the model with minimum AIC and BIC values is considered the best model.
 
 # Using AIC function
-AIC(lmModel)
+AIC(ols_model)
 # Using BIC function
-BIC(lmModel)
+BIC(ols_model)
 
 # RMSE
 names(ols_model)
-rmse(actual = train$Price, predicted = lmModel$fitted.values)
+rmse()
 
 #histogram of residuals
 hist(ols_model$residuals, color = "grey")
