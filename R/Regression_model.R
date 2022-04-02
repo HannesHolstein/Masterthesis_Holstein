@@ -3,7 +3,6 @@ library(caret)
 library(Metrics)
 library(car)
 
-
 #Data from Excel - preparation details see excel file in comments
 CPI <- read.csv("C:\\Users\\Hannes Holstein\\Documents\\R\\CPI.csv",sep=";")
 CPI_data <- do.call(cbind.data.frame, CPI)
