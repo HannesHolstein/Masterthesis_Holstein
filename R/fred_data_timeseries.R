@@ -46,12 +46,7 @@ series_sp500_df <- do.call(cbind.data.frame, series_sp500)
 
 
 
-# plotting data
-ggplot(series_gold_df) + geom_line(mapping = aes(x=date,y=value),
-                              color = "red") +
-  ggtitle("Gold Price]") +
-  xlab("time") +
-  ylab("test")
+
 
 
 
