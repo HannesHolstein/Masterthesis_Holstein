@@ -1,3 +1,5 @@
+#test
+
 library(foreign)
 library(caret)
 library(Metrics)
@@ -13,19 +15,72 @@ library(jtools)
 library(stargazer)
 library(ggplot2)
 library(xts)
+library(zoo)
+library(lubridate)
+library(readxl)
+
+citation("foreign")
 
 setwd("C:\\Users\\Holstein\\Documents\\R\\Projects\\Masterthesis_Holstein\\Data")
 
 #Data from Excel - preparation details see comments on files
 
 CPI <- read.csv(file ="CPI.csv",sep=";")
-CPI_data <- do.call(cbind.data.frame, CPI)
-BTC <- read.csv(file ="btc.csv",sep=";")
+CPI$Month <- mdy(CPI$Month)
+
+BTC <- read.csv(file ="btc.csv",sep=";" )
+BTC$Month <- mdy(BTC$Month)
+
 ETH <- read.csv(file="eth.csv",sep=";")
+ETH$ï..Month <- dmy(ETH$ï..Month) ###Warning message:
+###All formats failed to parse. No formats found.
+
 Gold <- read.csv(file="gold.csv",sep=";")
-REIT <- read.csv(file="6M_bill.csv",sep=";")
+Gold$Month <- mdy(Gold$Month)
+
+REIT <- read.csv(file="REIT.csv",sep=";")
+REIT$ï..Month <- dmy(REIT$ï..Month)
+
 SP500 <- read.csv(file="sp500.csv",sep=";")
+SP500$Month <- mdy(SP500$Month)
+
 Six_M_Bill <- read.csv(file="6m_bill.csv", sep=";")
+Six_M_Bill$Month <- mdy(Six_M_Bill$Month)
+
+##plots
+#CPI plot
+ggplot(CPI, aes(Month)) +
+  geom_line(aes(y = CPIAUCSL_PC1), color = "blue") +
+  geom_line(aes(y = CPILFESL_PC1), color = "red") +
+  xlab("Time") +
+  ylab("percent.change")+
+  ggtitle("test")
+#BTC plot
+ggplot(BTC, mapping=aes(x=Month,y=Moving.1.Month.Average,group=1))+
+  geom_line() +
+  ggtitle("test") +
+  scale_y_continuous(name="1-Month-average", breaks = c(0,1000,5000,10000,15000,20000,25000,30000,35000,40000,45000,50000,55000,60000))
+#Gold plot
+ggplot(Gold, mapping=aes(x=Month,y=AM,group=1))+
+  geom_line() +
+  ggtitle("test") +
+  scale_y_continuous(name="1-Month-average")
+#ETH plot
+ggplot(ETH, mapping=aes(x=ï..Month,y=Moving.1.Month.Average,group=1))+
+  geom_line() +
+  ggtitle("test") +
+  scale_y_continuous(name="1-Month-average")
+#REIT
+ggplot(REIT, mapping=aes(x=ï..Month,y=Moving.1.Month.Average,group=1))+
+  geom_line() +
+  ggtitle("test") +
+  scale_y_continuous(name="1-Month-average")
+#6m Bill plot
+ggplot(Six_M_Bill, mapping=aes(x=Month,y=Moving.1.Month.Average,group=1))+
+  geom_line() +
+  ggtitle("test") +
+  scale_y_continuous(name="1-Month-average")
+
 
 ##Regressions for different CPI's used
 #Define variable names for regression table output
@@ -37,22 +92,13 @@ REIT_sample<-REIT$Moving.1.Month.Average
 Treasury_bill_6m_sample<-Six_M_Bill$Moving.1.Month.Average
 SP500_sample<-SP500$Moving.1.Month.Average
 
-#plots
-rdate <- as.Date(BTC$ï..Month,"%mm/%yyyy")
-fix(rdate)
-plot(BTC$Moving.1.Month.Average~rdate)
-
-ggplot(BTC, mapping=
-         aes(x=Month,y=Moving.1.Month.Average, group=1)) + geom_line()
-
-
 #OLS-regression CPI all consumer
 lm(CPI$CPIAUCSL_PC1~BTC$Moving.1.Month.Average + Gold$AM + REIT$Moving.1.Month.Average + Six_M_Bill$Moving.1.Month.Average +  SP500$Moving.1.Month.Average)
 m1_all <- lm(CPI_all~BTC_sample+Gold_sample+REIT_sample+Treasury_bill_6m_sample+SP500_sample)
 
 #CPI less food & energy
 lm(CPI$CPILFESL_PC1~BTC$Moving.1.Month.Average + Gold$AM + REIT$Moving.1.Month.Average + Six_M_Bill$Moving.1.Month.Average +  SP500$Moving.1.Month.Average)
-m2_less <- lm(CPi_less_food_energy~BTC_sample+Gold_sample+REIT_sample+Treasury_bill_6m_sample+SP500_sample)
+m2_less <- lm(CPI_less_food_energy~BTC_sample+Gold_sample+REIT_sample+Treasury_bill_6m_sample+SP500_sample)
 
 # Checking model statistics
 tab_model(m1_all)
@@ -61,7 +107,7 @@ tab_model(m2_less)
 summary(m1_all)
 summary(m2_less)
 #html table output for regression
-stargazer(m1_all,m2_less, type = "html",  #use html output to match planned R Markdown output
+stargazer(m1_all,m2_less, type = "html",
           title = "Regression output CPI all urban consumers", out = "m1_reg.html")
 
 ##  AIC = – 2 * ln(likelihood) + 2 * p
@@ -101,6 +147,7 @@ vif(m1_less)
 
 #autocorrelation Durbin-Watson test
 library(lmtest)
+citation("lmtest")
 dwtest(m1_all)
 dwtest(m2_less)
 
