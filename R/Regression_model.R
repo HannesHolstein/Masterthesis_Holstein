@@ -103,3 +103,5 @@ vif(m1_less)
 library(lmtest)
 dwtest(m1_all)
 dwtest(m2_less)
+
+#correlations
