@@ -1,5 +1,3 @@
-#test
-
 library(foreign)
 library(caret)
 library(Metrics)
