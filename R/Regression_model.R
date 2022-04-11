@@ -19,7 +19,8 @@ library(readxl)
 
 citation("foreign")
 
-setwd("C:\\Users\\Holstein\\Documents\\R\\Projects\\Masterthesis_Holstein\\Data")
+setwd("C:\\Users\\Holstein\\Documents\\R\\Projects\\Masterthesis_Holstein\\Data\\aggregated")
+
 
 #Data from Excel - preparation details see comments on files
 
@@ -45,6 +46,7 @@ SP500$Month <- mdy(SP500$Month)
 Six_M_Bill <- read.csv(file="6m_bill.csv", sep=";")
 Six_M_Bill$Month <- mdy(Six_M_Bill$Month)
 
+
 ##plots
 #CPI plot
 ggplot(CPI, aes(Month)) +
@@ -52,31 +54,31 @@ ggplot(CPI, aes(Month)) +
   geom_line(aes(y = CPILFESL_PC1), color = "red") +
   xlab("Time") +
   ylab("percent.change")+
-  ggtitle("test")
+  ggtitle("CPI % change for all consumers/less food energy")
 #BTC plot
 ggplot(BTC, mapping=aes(x=Month,y=Moving.1.Month.Average,group=1))+
   geom_line() +
-  ggtitle("test") +
+  ggtitle("BTC monthly average price") +
   scale_y_continuous(name="1-Month-average", breaks = c(0,1000,5000,10000,15000,20000,25000,30000,35000,40000,45000,50000,55000,60000))
 #Gold plot
 ggplot(Gold, mapping=aes(x=Month,y=AM,group=1))+
   geom_line() +
-  ggtitle("test") +
+  ggtitle("Gold monthly average price") +
   scale_y_continuous(name="1-Month-average")
 #ETH plot
 ggplot(ETH, mapping=aes(x=ï..Month,y=Moving.1.Month.Average,group=1))+
   geom_line() +
-  ggtitle("test") +
+  ggtitle("ETH monthly average price") +
   scale_y_continuous(name="1-Month-average")
 #REIT
 ggplot(REIT, mapping=aes(x=ï..Month,y=Moving.1.Month.Average,group=1))+
   geom_line() +
-  ggtitle("test") +
+  ggtitle("Wilshire REIT index monthly average") +
   scale_y_continuous(name="1-Month-average")
 #6m Bill plot
 ggplot(Six_M_Bill, mapping=aes(x=Month,y=Moving.1.Month.Average,group=1))+
   geom_line() +
-  ggtitle("test") +
+  ggtitle("6-Months T-bill yield monthly average") +
   scale_y_continuous(name="1-Month-average")
 
 
