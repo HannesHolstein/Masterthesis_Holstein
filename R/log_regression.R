@@ -215,7 +215,52 @@ sample1_SP <-do.call(cbind.data.frame, series1_SP)
 series1_Bill <- data_aggr_Bill %>% slice(662:757)
 sample1_Bill <- do.call(cbind.data.frame, series1_Bill)
 
+#descriptive statistics for log returns
+mean_btc<-mean(sample1_BTC$Close)
+mean_eth<-mean(sample2_eth$Close)
+mean_gold<-mean(sample1_Gold$Closing)
+mean_reit<-mean(sample1_REIT$Closing,na.rm = TRUE)
+mean_sp<-mean(sample1_SP$Closing,na.rm = TRUE)
+mean_bill<-mean(sample1_Bill$Closing)
 
+min_btc<-min(sample1_BTC$Close)
+min_eth<-min(sample2_eth$Close)
+min_gold<-min(sample1_Gold$Closing)
+min_reit<-min(sample1_REIT$Closing,na.rm = TRUE)
+min_sp<-min(sample1_SP$Closing,na.rm = TRUE)
+min_bill<-min(sample1_Bill$Closing)
+
+max_btc<-max(sample1_BTC$Close)
+max_eth<-max(sample2_eth$Close)
+max_gold<-max(sample1_Gold$Closing)
+max_reit<-max(sample1_REIT$Closing,na.rm = TRUE)
+max_sp<-max(sample1_SP$Closing,na.rm = TRUE)
+max_bill<-max(sample1_Bill$Closing)
+
+sd_btc<-sd(sample1_BTC$Close)
+sd_eth<-sd(sample2_eth$Close)
+sd_gold<-sd(sample1_Gold$Closing)
+sd_reit<-sd(sample1_REIT$Closing,na.rm = TRUE)
+sd_sp<-sd(sample1_SP$Closing,na.rm = TRUE)
+sd_bill<-sd(sample1_Bill$Closing)
+
+
+df1 = data.frame(Variable = c('BTC','ETH','REIT','Gold','SP','Bill'),
+                 n=c(96,96,96,96,96,96),
+                 mean=c(mean_btc,mean_eth,mean_reit,mean_gold,mean_sp,mean_bill),
+                 min=c(min_btc,min_eth,min_reit,min_gold,min_sp,min_bill),
+                 max=c(max_btc,max_eth,max_reit,max_gold,max_sp,max_bill),
+                 sd=c(sd_btc,sd_eth,sd_reit,sd_gold,sd_sp,sd_bill))
+
+write.table(df1,file="C:\\Users\\Holstein\\Documents\\R\\Projects\\Masterthesis_Holstein\\Data\\descriptives.txt")
+
+
+#correlation matrix
+series2_BTC <- data_aggr_BTC %>% slice(64:135)
+sample2_BTC <- do.call(cbind.data.frame, series2_BTC)
+df2 = data.frame(Bitcoin = sample2_BTC$Close, ETH =sample2_eth$Close, REIT= sample2_REIT$Closing,
+                 Gold = sample2_Gold$Closing, SP =sample2_SP$Closing, Bill = sample2_Bill$Closing)
+cor(df2)
 
 #BTC plot
 ggplot(sample1_BTC, mapping=aes(x=year_month,y=Close,group=1))+
@@ -375,7 +420,12 @@ sample2_SP <-do.call(cbind.data.frame, series2_SP)
 series2_Bill <- sample1_Bill %>% slice(25:96)
 sample2_Bill <- do.call(cbind.data.frame, series2_Bill)
 
-CPI_all
+CPI_all_2<-CPI$CPIAUCSL_PC1
+CPI_all_2<-CPI_all_2[25:96]
+
+
+CPI_less_food_energy_2<-CPI$CPILFESL_PC1
+CPI_less_food_energy_2<-CPI_less_food_energy_2[25:96]
 
 #define variables for regression
 ETH_logreturn2<-sample2_eth$Close
@@ -385,11 +435,10 @@ sp500_logreturn2<-sample2_SP$Closing
 bill_loginterest2<-sample2_Bill$Closing
 
 
-
-m3_all <- lm(CPI_all~ETH_logreturn2+REIT_logreturn2+ sp500_logreturn2+bill_loginterest2)
+m3_all <- lm(CPI_all_2~ETH_logreturn2+REIT_logreturn2+Gold_logreturn2+ sp500_logreturn2+bill_loginterest2)
 
 #CPI less food & energy
-m4_less <- lm(CPI_less_food_energy~ETH_logreturn2+Gold_logreturn2+REIT_logreturn2+ sp500_logreturn2+bill_loginterest2)
+m4_less <- lm(CPI_less_food_energy_2~ETH_logreturn2+Gold_logreturn2+REIT_logreturn2+ sp500_logreturn2+bill_loginterest2)
 
 
 l6 <- lm(CPI_all~ETH_logreturn2)
