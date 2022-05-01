@@ -18,8 +18,9 @@ coin_info_btc
 #1.2 Bitcoin: price time series data
 coin_hist_btc <- crypto_history(coins_btc, limit=1, start_date="20160101", end_date="20211201")
 coin_hist_btc_closing <- data.frame(coin_hist_btc$timestamp,coin_hist_btc$close)
+# remove hour time stamp
 
-#1.3 Bitcoin: Transformation price into return in %
+
 
 ########################
 
@@ -32,9 +33,10 @@ coins_eth_slice <- coins_eth %>% slice(164:164)
 
 #2.2 Ethereum: price time series data
 coin_hist_eth <- crypto_history(coins_eth_slice, limit=1, start_date="20160101", end_date="20220101")
-coin_hist_eth_closing <- data.frame(coin_hist_eth$timestamp,coin_hist_eth$close)
-
-
-
-
+coin_hist_eth_closing1 <- data.frame(coin_hist_eth$timestamp,coin_hist_eth$close)
+# remove hour time stamp
+coin_hist_eth_closing <- coin_hist_eth_closing1
+coin_hist_eth_closing$coin_hist_eth.timestamp <- gsub(" 23:59:59","",as.character(coin_hist_eth_closing1$coin_hist_eth.timestamp))
+# save as csv
+write.table(coin_hist_eth_closing,"C:\\Users\\Holstein\\Documents\\R\\Projects\\Masterthesis_Holstein\\Data\\aggregated\\eth.csv",sep=";", row.names = TRUE)
 

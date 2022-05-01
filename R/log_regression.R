@@ -2,7 +2,7 @@ setwd("C:\\Users\\Holstein\\Documents\\R\\Projects\\Masterthesis_Holstein\\Data"
 
 library(tidyverse)
 library(xts)
-
+library(MASS)
 library(foreign)
 library(caret)
 library(Metrics)
@@ -21,6 +21,7 @@ library(xts)
 library(zoo)
 library(lubridate)
 library(readxl)
+library(dplyr)
 
 citation("foreign")
 
@@ -40,11 +41,11 @@ data_BTC$month <- strftime(data_BTC$date, "%m")   # Create month column
 data_aggr_BTC1 <- aggregate(Close ~ month + year,       # Aggregate data
                         data_BTC,
                         FUN = sum)                                                   # load lubridate
-library("lubridate")
+
 data_BTC2 <- BTC                                   # Duplicate data
 data_BTC2$year_month <- floor_date(data_BTC2$date,  # Create year-month column
                                    "month")
-library("dplyr")                                    # Load dplyr
+                                   # Load dplyr
 data_aggr_BTC <- data_BTC2 %＞%                         # Aggregate data
   group_by(year_month) %＞%
   dplyr::summarize(Close =sum(Close)) %＞%
@@ -170,10 +171,29 @@ data_aggr_SP <- data_SP2 %＞%
 
 #Treasury bill
 #Cochrane and Piazzesi -> log yield
-Six_M_Bill <- read.csv(file="6m_bill.csv", sep=";")
-Six_M_Bill$Month <- mdy(Six_M_Bill$Month)
-
-
+Bill1 <- read.csv(file="6m_bill.csv", sep=";")
+Bill1$Closing <- as.numeric(Bill1$Closing) +1
+Bill1 %>% map_df(rev)
+Bill2 <- Bill1 %>% map_df(rev)
+Bill3 <- Bill2 %>% map_df(rev)
+#daily log return
+Bill3$Closing <- log(Bill3$Closing)
+#aggregate monthly log return
+Bill3$ï..Date <- as.Date(Bill3$ï..Date)
+Bill <- Bill3
+data_Bill <- Bill
+data_Bill$year <- strftime(data_Bill$ï..Date, "%Y")
+data_Bill$month <- strftime(data_Bill$ï..Date, "%m")
+data_aggr_Bill1 <- aggregate(Closing ~ month + year,
+                             data_Bill,
+                             FUN = sum,na.rm = TRUE)
+data_Bill2 <- Bill
+data_Bill2$year_month <- floor_date(data_Bill2$ï..Date,
+                                    "month")
+data_aggr_Bill <- data_Bill2 %＞%
+  group_by(year_month) %＞%
+  dplyr::summarize(Closing =sum(Closing,na.rm = TRUE)) %＞%
+  as.data.frame()
 
 
 
@@ -192,11 +212,42 @@ sample1_REIT <-do.call(cbind.data.frame, series1_REIT)
 series1_SP <- data_aggr_SP %>% slice(1:96)
 sample1_SP <-do.call(cbind.data.frame, series1_SP)
 
-#slice data for ETH sample size to be added
+series1_Bill <- data_aggr_Bill %>% slice(662:757)
+sample1_Bill <- do.call(cbind.data.frame, series1_Bill)
 
 
 
+#BTC plot
+ggplot(sample1_BTC, mapping=aes(x=year_month,y=Close,group=1))+
+  geom_line() +
+  ggtitle("Bitcoin") +
+  scale_y_continuous(name="aggr. monthly log return",breaks = c(0,0.1,0.25,0.5,0.75,1),limits=c(-1,1))
+#Gold plot
+ggplot(sample1_Gold, mapping=aes(x=year_month,y=Closing,group=1))+
+  geom_line() +
+  ggtitle("Gold") +
+  scale_y_continuous(name="aggr. monthly log return",breaks = c(0,0.1,0.25,0.5,0.75,1),limits=c(-1,1))
+#ETH plot
+ggplot(series1_ETH, mapping=aes(x=year_month,y=Close,group=1))+
+  geom_line() +
+  ggtitle("ETH") +
+  scale_y_continuous(name="aggr. monthly log return",breaks = c(0,0.1,0.25,0.5,0.75,1),limits=c(-1,1))
+#REIT
+ggplot(sample1_REIT, mapping=aes(x=year_month,y=Closing,group=1))+
+  geom_line() +
+  ggtitle("Wilshire REIT index") +
+  scale_y_continuous(name="aggr. monthly log return",breaks = c(0,0.1,0.25,0.5,0.75,1),limits=c(-1,1))
+#SP500 plot
+ggplot(sample1_SP, mapping=aes(x=year_month,y=Closing,group=1))+
+  geom_line() +
+  ggtitle("S&P500") +
+  scale_y_continuous(name="aggr. monthly log return",breaks = c(0,0.1,0.25,0.5,0.75,1),limits=c(-1,1))
 
+#6m Bill plot
+ggplot(sample1_Bill, mapping=aes(x=year_month,y=Closing,group=1))+
+  geom_line() +
+  ggtitle("6-Month treasury bill") +
+  scale_y_continuous(name="aggr. monthly log return",breaks = c(0,0.1,0.25,0.5,0.75,1),limits=c(-1,1))
 
 
 
@@ -212,14 +263,27 @@ CPI_less_food_energy<- CPI$CPILFESL_PC1
 BTC_logreturn1<-sample1_BTC$Close
 Gold_logreturn1<-sample1_Gold$Closing
 REIT_logreturn1<-sample1_REIT$Closing
-########Treasury_bill_6m_sample<-Six_M_Bill$Moving.1.Month.Average not included yet
-SP500_logreturn1<-sample1_SP$Closing
+bill_loginterest1<-sample1_Bill$Closing
+SP500_logreturn1 <- sample1_SP$Closing
+
+
 
 #OLS-regression CPI all consumer
-m1_all <- lm(CPI_all~BTC_logreturn1+Gold_logreturn1+REIT_logreturn1+ SP500_logreturn1)
+m1_all <- lm(CPI_all~BTC_logreturn1+Gold_logreturn1+REIT_logreturn1+ SP500_logreturn1+bill_loginterest)
 
 #CPI less food & energy
-m2_less <- lm(CPI_less_food_energy~BTC_logreturn1+Gold_logreturn1+REIT_logreturn1+SP500_logreturn1)
+m2_less <- lm(CPI_less_food_energy~BTC_logreturn1+Gold_logreturn1+REIT_logreturn1+SP500_logreturn1+bill_loginterest)
+
+
+l1 <- lm(CPI_all~BTC_logreturn1)
+l2 <- lm(CPI_all~Gold_logreturn1)
+l3 <- lm(CPI_all~REIT_logreturn1)
+l4 <- lm(CPI_all~SP500_logreturn1)
+l5 <- lm(CPI_all~bill_loginterest1)
+stargazer(l1,l2,l3,l4,l5, type = "html",
+          title = "test", out = "test.html")
+
+
 
 # Checking model statistics
 tab_model(m1_all)
@@ -229,7 +293,7 @@ summary(m1_all)
 summary(m2_less)
 #html table output for regression
 stargazer(m1_all,m2_less, type = "html",
-          title = "Regression output CPI all urban consumers", out = "m1_reg.html")
+          title = "Regression output CPI all urban consumers", out = "btc_reg.html")
 
 ##  AIC = – 2 * ln(likelihood) + 2 * p
 ##  BIC = – 2 * ln(likelihood) + ln(N) * p
@@ -251,6 +315,20 @@ rmse(m1_all)
 names(m2_less)
 rmse(m2_less)
 
+RSS_m1 <- c(crossprod(m1_all$residuals))
+RSS_m2 <- c(crossprod(m2_less$residuals))
+
+#Mean squared error:
+MSE_m1 <- RSS_m1 / length(m1_all$residuals)
+MSE_m2 <- RSS_m2 / length(m2_less$residuals)
+
+#Root MSE:
+RMSE_m1 <- sqrt(MSE_m1)
+RMSE_m2 <- sqrt(MSE_m2)
+
+#Pearson estimated residual variance (as returned by summary.lm):
+sig2_m1 <- RSS_m1 / m1_all$df.residual
+sig2_m2 <- RSS_m2 / m2_less$df.residual
 #histogram of residuals
 hist(m1_all$residuals, color = "grey")
 hist(m2_less$residuals, color = "grey")
@@ -264,7 +342,7 @@ plot(m2_less,main="M2: CPI less food/energy")
 
 #VIF calculation
 vif(m1_all)
-vif(m1_less)
+vif(m2_less)
 
 #autocorrelation Durbin-Watson test
 library(lmtest)
@@ -272,7 +350,63 @@ citation("lmtest")
 dwtest(m1_all)
 dwtest(m2_less)
 
-#correlations
 
 
+
+
+
+
+
+## Regression of ETH sample
+#slice data for ETH sample size 2016-2021 -> series2/sample2 for ETH
+series2_eth <- data_aggr_ETH
+sample2_eth <- series2_eth
+sample2_eth$Close[is.na(sample2_eth$Close)] <- as.numeric(0.01)
+
+series2_Gold <- sample1_Gold %>% slice(25:96)
+sample2_Gold <- do.call(cbind.data.frame, series2_Gold)
+
+series2_REIT <- sample1_REIT %>% slice(25:96)
+sample2_REIT <-do.call(cbind.data.frame, series2_REIT)
+
+series2_SP <- sample1_SP %>% slice(25:96)
+sample2_SP <-do.call(cbind.data.frame, series2_SP)
+
+series2_Bill <- sample1_Bill %>% slice(25:96)
+sample2_Bill <- do.call(cbind.data.frame, series2_Bill)
+
+CPI_all
+
+#define variables for regression
+ETH_logreturn2<-sample2_eth$Close
+Gold_logreturn2<-sample2_Gold$Closing
+REIT_logreturn2<-sample2_REIT$Closing
+sp500_logreturn2<-sample2_SP$Closing
+bill_loginterest2<-sample2_Bill$Closing
+
+
+
+m3_all <- lm(CPI_all~ETH_logreturn2+REIT_logreturn2+ sp500_logreturn2+bill_loginterest2)
+
+#CPI less food & energy
+m4_less <- lm(CPI_less_food_energy~ETH_logreturn2+Gold_logreturn2+REIT_logreturn2+ sp500_logreturn2+bill_loginterest2)
+
+
+l6 <- lm(CPI_all~ETH_logreturn2)
+l7 <- lm(CPI_all~Gold_logreturn2)
+l8 <- lm(CPI_all~REIT_logreturn2)
+l9 <- lm(CPI_all~sp500_logreturn2)
+l10 <- lm(CPI_all~bill_loginterest2)
+stargazer(l1,l2,l3,l4,l5, type = "html",
+          title = "test", out = "test.html")
+
+# Checking model statistics
+tab_model(m3_all)
+tab_model(m4_less)
+
+summary(m3_all)
+summary(m4_less)
+#html table output for regression
+stargazer(m3_all,m4_less, type = "html",
+          title = "Regression output CPI all urban consumers", out = "eth_reg.html")
 

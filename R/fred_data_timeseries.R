@@ -6,13 +6,7 @@ library(readr)
 #API-Key for FRED (user dependent)
 usethis::edit_r_environ()
 
-#gold data
-
-search_gold <- fredr_series_search_text("Gold price")
-colnames(search_gold)
-series_gold_all <- read_csv("C:\\Users\\Holstein\\Documents\\R\\Projects\\Masterthesis_Holstein\\Masterthesis_Holstein_R\\GOLDAMGBD228NLBM.csv")
-series_gold <- series_gold_all %>% slice(12460:14025)
-series_gold_df <- do.call(cbind.data.frame, series_gold)
+#gold data available over csv file in regression - source is noted in thesis
 
 #cpi data
 search_CPI <- fredr_series_search_text("Consumer Price Index: Total")
