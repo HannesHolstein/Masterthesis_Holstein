@@ -24,7 +24,8 @@ library(readxl)
 library(dplyr)
 
 citation("foreign")
-
+# for simplification the data was downloaded as csv files from the websites seen in the excel file
+# see crypto_data and fred_data_timeseries scripts to potentially get the data as API data too
 #BTC
 BTC1 <- read.csv(file ="BTC.csv",sep=";")
 BTC1 %>% map_df(rev)
